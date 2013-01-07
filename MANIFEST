@@ -1,0 +1,4 @@
+MANIFEST
+lib/Net/Domain/Regex.pm
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)
