@@ -6,6 +6,6 @@ WriteMakefile(
     AUTHOR       => 'Peter Blair (pblair@cpan.org)',
     ABSTRACT     => 'Class to extract domain names from text',
     PREREQ_PM    => {
-			'LWP::UserAgent' => '6.04',
+			'LWP::UserAgent' => '6.03',
                     },
 );

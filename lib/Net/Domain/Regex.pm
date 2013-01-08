@@ -2,13 +2,19 @@ package Net::Domain::Regex;
 
 use strict;
 
-our $VERSION = 0.001_004;
+our $VERSION = 0.001_006;
 
 our $LOCAL = '/tmp/effective_tld_names.dat';
 our $CACHE = '/tmp/effective_tld_names.dat.cache';
 our $SOURCE = 'http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1';
 
 use LWP::UserAgent;
+
+sub import {
+	if( grep { /:pdata/ } @_ ){
+		$SOURCE = 'https://raw.github.com/petermblair/Perl-CPAN/master/Net-Domain-Regex/misc/tld.txt';
+	}
+}
 
 sub new {
 	my $class = shift;
@@ -79,9 +85,19 @@ sub pull {
 sub generate_regex {
 	my $self = shift;
 
-	my $sld = join( "|", sort keys %{$self->{sld}} );
-	$sld =~ s/\./\\./g;
-	my $tld = join( "|", sort keys %{$self->{tld}} );
+	my @a;
+
+	for( keys %{$self->{sld}} ){
+		push( @a, $_ );
+	}
+
+	for( keys %{$self->{tld}} ){
+		push( @a, $_ );
+	}
+
+	my @atld = sort { length $b cmp length $a } @a;
+
+	my $tld = join( "|", @atld );
 	$tld =~ s/\./\\./g;
 
 	#my $regex = "((?:[a-zA-Z0-9]\\w+\\.)(($tld)|($sld)))";
