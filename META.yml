@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Net-Domain-Regex
-version:            0.000101
+version:            0.001004
 abstract:           Class to extract domain names from text
 author:
     - Peter Blair (pblair@cpan.org)
@@ -10,7 +10,8 @@ configure_requires:
     ExtUtils::MakeMaker:  0
 build_requires:
     ExtUtils::MakeMaker:  0
-requires:  {}
+requires:
+    LWP::UserAgent:  6.04
 no_index:
     directory:
         - t

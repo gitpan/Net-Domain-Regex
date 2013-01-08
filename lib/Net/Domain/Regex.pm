@@ -2,14 +2,13 @@ package Net::Domain::Regex;
 
 use strict;
 
-our $VERSION = 0.0001_01;
+our $VERSION = 0.001_004;
 
 our $LOCAL = '/tmp/effective_tld_names.dat';
 our $CACHE = '/tmp/effective_tld_names.dat.cache';
 our $SOURCE = 'http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1';
 
 use LWP::UserAgent;
-use Cache::FileCache;
 
 sub new {
 	my $class = shift;
@@ -23,20 +22,11 @@ sub new {
 
 	my $o = bless $args => $class;
 
-	unless( -e $self->{local} ){
+	unless( -e $o->{local} ){
 		$o->pull;
 	}
 
-	$self->{filecache} = Cache::FileCache->new;
-
-	unless( $self->{filecache}->get( 'sld' ) && $self->{filecache}->get( 'tld' ) ){
-		$o->refresh;
-		$self->{filecache}->set( 'sld', $o->{sld}, "1 month" );
-		$self->{filecache}->set( 'tld', $o->{tld}, "1 month" );
-	}
-
-	$o->{sld} = $self->{filecache}->get( 'sld' );
-	$o->{tld} = $self->{filecache}->get( 'tld' );
+	$o->refresh;
 
 	return $o;
 }
@@ -44,32 +34,30 @@ sub new {
 sub refresh {
 	my $self = shift;
 
+	use open qw(:std :utf8);
 	open FD, "<$self->{local}";
 
-	my $tld = {};
-	my $sld = {};
+	my $tlds = {};
+	my $slds = {};
 
 	while( <FD> ){
 		chomp;
 
 		if(/^(\S[^\.\s]+)$/){
-			$tld->{$1}++;
+			$tlds->{$1}++;
 		}
-
-		for my $t ( keys %$tld ){
-			if( /^(\S[^\.\s]+\.$t)$/ ){
-				$sld->{$1}++;
-			}
+		elsif ( /^\S[^\.\s]+\.(.+)$/ && exists $tlds->{$1} ) {
+			$slds->{$_}++;
 		}
 	}
 
 	# any manual overrides
 	for( qw/ co.uk / ){
-		$tld->{"$_"}++;
+		$tlds->{"$_"}++;
 	}
 
-	$self->{tld} = $tld;
-	$self->{sld} = $sld;
+	$self->{tld} = $tlds;
+	$self->{sld} = $slds;
 }
 
 sub pull {
