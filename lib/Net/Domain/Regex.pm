@@ -2,7 +2,7 @@ package Net::Domain::Regex;
 
 use strict;
 
-our $VERSION = 0.001_006;
+use version; our $VERSION = qv('0.2.0');
 
 our $LOCAL = '/tmp/effective_tld_names.dat';
 our $CACHE = '/tmp/effective_tld_names.dat.cache';
