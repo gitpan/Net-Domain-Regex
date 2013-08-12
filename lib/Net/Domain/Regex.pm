@@ -2,7 +2,7 @@ package Net::Domain::Regex;
 
 use strict;
 
-use version; our $VERSION = qv('0.2.0');
+use version; our $VERSION = qv('0.2.1');
 
 our $LOCAL = '/tmp/effective_tld_names.dat';
 our $CACHE = '/tmp/effective_tld_names.dat.cache';
@@ -101,7 +101,7 @@ sub generate_regex {
 	$tld =~ s/\./\\./g;
 
 	#my $regex = "((?:[a-zA-Z0-9]\\w+\\.)(($tld)|($sld)))";
-	my $regex = "((?:[a-zA-Z0-9]\\w+\\.)+(com|net|org|edu|$tld))\$";
+	my $regex = "((?:[a-zA-Z0-9][\\w\\-]+\\.)+(com|net|org|edu|$tld))\$";
 
 	return $regex;
 }
@@ -115,7 +115,7 @@ sub match {
 	
 	#print "Regex: [$regex]\n";
 
-	my @tokens = split /[^\w\.]/, $target;
+	my @tokens = split /[^\w\.\-]/, $target;
 	my @results;
 
 	for my $target( @tokens ){
